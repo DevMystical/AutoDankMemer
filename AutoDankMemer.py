@@ -377,7 +377,7 @@ async def on_message(message: discord.Message):
                 log(f"{message.author.display_name} attempted to rob you.", LogType.ROBBERY)
                 robbery_target_message_ids.append(message.id)
             except:
-                raise
+                pass
 
     if not message.author.id == DANK_MEMER_ID: return
     bot_message = BotMessage(message)
@@ -385,15 +385,16 @@ async def on_message(message: discord.Message):
     if "a massive padlock on their wallet" in message.content:
         bot_message.check_message_reference(robbery_target_message_ids)
         if not bot_message.loaded_data_dict is None:
+            running = False
+            await asyncio.sleep(10)
             try:
-                await asyncio.sleep(10)
                 padlock_use_msg_ids.append(post_message("pls use padlock"))
                 await asyncio.sleep(5)
             except:
                 pass
             running = True
     
-    if "You don't own this item" in message.content:
+    elif "You don't own this item" in message.content:
         bot_message.check_message_reference(padlock_use_msg_ids)
         if not bot_message.loaded_data_dict is None:
             running = False
@@ -402,14 +403,14 @@ async def on_message(message: discord.Message):
                 post_message("pls with 15000")
                 await asyncio.sleep(5)
                 post_message("pls buy padlock 3")
-                log("No padlocks remaining, purchased three.", LogType.ROBBERY)
+                log("Purchased a padlock.", LogType.ROBBERY)
                 await asyncio.sleep(5)
                 padlock_use_msg_ids.append(post_message("pls use padlock"))
             except:
                 pass
             running = True
         
-    if "Your wallet now has a padlock on it." in message.content:
+    elif "Your wallet now has a padlock on it." in message.content:
         bot_message.check_message_reference(padlock_use_msg_ids)
         if not bot_message.loaded_data_dict is None:
             running = False
@@ -420,13 +421,13 @@ async def on_message(message: discord.Message):
                     post_message(f"pls with {(3 - padlock_quantity_remaining) * 5000}")
                     await asyncio.sleep(5)
                     post_message(f"pls buy padlock {3 - padlock_quantity_remaining}")
-                    log("Purchased  padlock.", LogType.ROBBERY)
+                    log("Purchased a padlock.", LogType.ROBBERY)
                     await asyncio.sleep(5)
             except:
                 pass
             running = True
 
-    if "Attack the boss by clicking" in message.content:
+    elif "Attack the boss by clicking" in message.content:
         try:
             while True:
                 status_code = bot_message.press_button_at_index(0)
@@ -482,12 +483,15 @@ async def on_message(message: discord.Message):
                 bot_message.remove_cost("Fish", 25000)
             elif "Catch the fish!" in message.content:
                 target = message.content.split("\n")[1]
-                if target.split(":legendaryfish:")[0] == "       ":
+                emoji = ":legendaryfish:" if "Legendary" in target else ":Kraken:"
+                if target.split(emoji)[0] == "       ":
                     bot_message.press_button_at_index(1)
-                elif target.split(":legendaryfish:")[0] == "":
+                elif target.split(emoji)[0] == "":
                     bot_message.press_button_at_index(0)
                 else:
                     bot_message.press_button_at_index(2)
+            elif "Bank Note" in message.content:
+                post_message("pls use banknote 1")
         
         elif bot_message.command_name == "dig":
             if "You don't have a shovel" in message.content:
@@ -510,6 +514,8 @@ async def on_message(message: discord.Message):
                     bot_message.press_button_at_index(2)
                 else:
                     bot_message.press_button_at_index(0)
+            elif "Bank Note" in message.content:
+                post_message("pls use banknote 1")
     except:
         pass
 
