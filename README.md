@@ -7,6 +7,8 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 
 ## Features
 
+### Commands
+
 - Plays `highlow` correctly.
 - Begs for coins.
 - Only selects places for `search` that never cause death.
@@ -16,6 +18,11 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Hunts for items and automatically sells sellables.
 - Automatically purchases lifesavers when you die.
 - Plays `trivia` and gets the correct answer for 99% of questions.
+- Automatically deposits into the bank.
+- Detects if you are robbed and uses a padlock.
+- Buys more padlocks if you go under 3 remaining.
+
+### Backend
 
 - Logs profits and costs using a fairly advanced parsing system.
 - Bot command system for management and statistics.
@@ -24,7 +31,7 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Supports pressing buttons and using discord interactions.
 - Easily move the current operational channel to other servers or channels.
 
-Notes: 
+### Notes
 
 - The bot has the capability to use `crime` but it is disabled in the source code because it causes so many deaths and the lifesavers get extremely expensive. Modify the variable `active_commands` at its definition to re-enable it.
 - The `trivia` command knows almost all of the questions used by API which Dank Memer uses. However, there are 30-40 questions missing out of roughly 4,000.
@@ -57,6 +64,8 @@ Notes:
 
 ## Configuration
 
+- Open `AutoDankMemer.py` and go to the python list on line `209`. Edit it and remove any modules you don't want to use.
+- Keep the list on line #208 intact and use it as a template. `"crime"` is disabled on line `209` by default.
 - Open `BotConfig.json`.
 - Have a bot in a server with yourself and Dank Memer.
 - Place the bot's token in the space which reads `BOT_TOKEN`.
