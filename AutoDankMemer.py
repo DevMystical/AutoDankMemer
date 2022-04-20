@@ -442,6 +442,12 @@ async def on_message(message: discord.Message):
                     log(f"PURCHASED LIFESAVER", LogType.BUY)
                     post_message("pls buy livesaver")
                     bot_message.remove_cost("Hunt", 50000)
+            elif "Dodge the Fireball" in message.content:
+                target = message.content.split("\n")[2]
+                if target.split(":FireBall:")[0] == "":
+                    bot_message.press_button_at_index(2)
+                else:
+                    bot_message.press_button_at_index(0)
     except:
         pass
 
