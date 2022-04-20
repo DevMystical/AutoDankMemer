@@ -3,7 +3,7 @@ Automated bot to farm money on the Dank Memer Discord bot.
 
 Runs a discord.py session on a bot account and sends messages using a user account. The bot has a command system that can only be used by the targeted user account. The commands are listed below.
 
-PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot does absolutely have an automatic blacklist system which detects spam. It is recommended for you to only use this bot periodically. Leaving running for more than two hours is HIGHLY discouraged and done completely at your own risk.
+PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot does absolutely have an automatic blacklist system which detects spam. It is recommended for you to only use this bot periodically. Leaving running for more than six hours is HIGHLY discouraged and done completely at your own risk.
 
 ## Features
 
