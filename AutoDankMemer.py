@@ -7,6 +7,7 @@ class LogType:
     BUY     = ("\033[1;38;2;25;130;196m", "BUY",     1)
     EARN    = ("\033[1;38;2;138;201;38m", "EARN",    0)
     ERROR   = ("\033[1;38;5;196m",        "WARN",    0)
+    ROBBERY = ("\033[1;38;5;196m",        "ROB",     1)
     SUMMARY = ("\033[0;1;97m",            "SUMMARY", 0)
 
 def log(message, log_type):
@@ -23,7 +24,7 @@ def get_guild_id(channel_id):
 def get_my_information(token):
     try:
         data = requests.get(f"https://discord.com/api/v9/users/@me", headers={"Authorization": token}).json()
-        return data["id"], data["username"]
+        return data["id"], data["username"], data["discriminator"]
     except KeyError:
         return None
 
@@ -37,7 +38,7 @@ BOT_TOKEN = config["BOT_TOKEN"]
 USER_TOKEN = config["USER_TOKEN"]
 CHANNEL_ID = config["CHANNEL_ID"]
 GUILD_ID = get_guild_id(CHANNEL_ID)
-MY_ID, NAME = get_my_information(USER_TOKEN)
+MY_ID, NAME, MY_DISCRIM = get_my_information(USER_TOKEN)
 DANK_MEMER_ID = 270904126974590976
 
 if GUILD_ID is None:
@@ -62,12 +63,14 @@ else:
         for question in question_list:
             TRIVIA_DATA[cat_name][b64(question["question"])] = b64(question["answer"])
 
-COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 150, "crime": 45, "trivia": 20}
+COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300}
 CRIME_DEATH_CHUNKS = ["shot", "killed", "choked to death", "MURDERED", "died", "death penalty"]
 SEARCH_DEATH_CHUNKS = ["killing", "died", "shot", "killed", "mutant", "catfished", "and bit you.", "parked", "infectious disease ward", 
     "sent chills down your spine", "burned to death", "TO DEATH", "hit by a car LOL", "Epsteined"]
 SEARCH_PRIORITY = ["coat", "mailbox", "pantry", "shoe", "grass", "who asked", "pocket", "sink", "dresser", "laundromat", "bus",
     "basement", "car", "fridge", "washer", "vacuum"]
+STEAL_FLAGS = [f"pls rob {NAME}#{MY_DISCRIM}", f"pls rob <@{MY_ID}>", f"pls steal {NAME}#{MY_DISCRIM}", f"pls steal <@{MY_ID}>",
+    f"pls ripoff {NAME}#{MY_DISCRIM}", f"pls ripoff <@{MY_ID}>"]
 
 def post_message(content):
     res = requests.post(f"https://discord.com/api/v9/channels/{CHANNEL_ID}/messages", headers={"Authorization": USER_TOKEN}, json={"content": content})
@@ -113,6 +116,8 @@ class BotMessage:
         self.message_id = message.id
         self.load_message_data = False
         self.command_name = None
+        self.loaded_data_dict = None
+        self.dumped_data = None
 
         try:
             if message.embeds[0].author.name in [NAME + "'s high-low game", NAME + "'s winning high-low game", NAME + "'s losing high-low game"]:
@@ -125,16 +130,18 @@ class BotMessage:
             pass
 
         for command in COMMANDS.keys():
-            try:
-                if str(self.message.reference.message_id) in message_ids[command]:
-                    self.load_message_data = True
+            self.check_message_reference(message_ids[command], command)
+    
+    def check_message_reference(self, array, command=None):
+        try:
+            if str(self.message.reference.message_id) in [str(i) for i in array]:
+                self.load_message_data = True
+                if not command is None:
                     self.command_name = command
-            except:
-                pass
-
-        if self.load_message_data:
-            self.loaded_data_dict = self.get_message_data()
-            self.dumped_data = json.dumps(self.loaded_data_dict)
+                self.loaded_data_dict = self.get_message_data()
+                self.dumped_data = json.dumps(self.loaded_data_dict)
+        except:
+            return False
     
     def press_random_button(self, button_count):
         if not "components" in self.loaded_data_dict: return
@@ -188,6 +195,8 @@ class BotMessage:
         costs[command_name] += cost
 
 message_ids = {item: [] for item in COMMANDS.keys()}
+robbery_target_message_ids = []
+padlock_use_msg_ids = []
 use_counts = {}
 next_use = {}
 earnings = {}
@@ -195,9 +204,9 @@ costs = {}
 running = True
 buy_lifesavers = True
 
-# Full command list template
-# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia"]
+# Full command list template, with crime enabled
+# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max"]
 
 client = discord.Client()
 
@@ -223,6 +232,8 @@ async def command_start_loop():
 async def on_ready():
     log(f"Logged in as {client.user.display_name}#{client.user.discriminator} ({client.user.id})", LogType.INFO)
     log(f"Listening for commands on Channel ID {CHANNEL_ID}" , LogType.INFO)
+    padlock_use_msg_ids.append(post_message("pls use padlock"))
+    await asyncio.sleep(3)
     command_start_loop.start()
 
 @client.event
@@ -360,10 +371,62 @@ async def on_message(message: discord.Message):
                     embed.set_footer(text="Created by Mystical")
                     await message.channel.send(embed=embed)
 
+    for item in STEAL_FLAGS:
+        if item in message.content.lower():
+            try:
+                log(f"{message.author.display_name} attempted to rob you.", LogType.ROBBERY)
+                robbery_target_message_ids.append(message.id)
+            except:
+                raise
+
     if not message.author.id == DANK_MEMER_ID: return
+    bot_message = BotMessage(message)
+
+    if "a massive padlock on their wallet" in message.content:
+        bot_message.check_message_reference(robbery_target_message_ids)
+        if not bot_message.loaded_data_dict is None:
+            try:
+                await asyncio.sleep(10)
+                padlock_use_msg_ids.append(post_message("pls use padlock"))
+                await asyncio.sleep(5)
+            except:
+                pass
+            running = True
+    
+    if "You don't own this item" in message.content:
+        bot_message.check_message_reference(padlock_use_msg_ids)
+        if not bot_message.loaded_data_dict is None:
+            running = False
+            await asyncio.sleep(10)
+            try:
+                post_message("pls with 5000")
+                await asyncio.sleep(5)
+                post_message("pls buy padlock")
+                log("Purchased a padlock.", LogType.ROBBERY)
+                await asyncio.sleep(5)
+                padlock_use_msg_ids.append(post_message("pls use padlock"))
+            except:
+                pass
+            running = True
+        
+    if "Your wallet now has a padlock on it." in message.content:
+        bot_message.check_message_reference(padlock_use_msg_ids)
+        if not bot_message.loaded_data_dict is None:
+            running = False
+            await asyncio.sleep(10)
+            try:
+                padlock_quantity_remaining = int(message.content.split("You have ")[1].split("x Padlock")[0])
+                if padlock_quantity_remaining < 3:
+                    post_message(f"pls with {(3 - padlock_quantity_remaining) * 5000}")
+                    await asyncio.sleep(5)
+                    post_message(f"pls buy padlock {3 - padlock_quantity_remaining}")
+                    log("Purchased a padlock.", LogType.ROBBERY)
+                    await asyncio.sleep(5)
+            except:
+                pass
+            running = True
 
     if "Attack the boss by clicking" in message.content:
-        bot_message = BotMessage(message)
         try:
             while True:
                 status_code = bot_message.press_button_at_index(0)
@@ -374,7 +437,6 @@ async def on_message(message: discord.Message):
             pass
     
     try:
-        bot_message = BotMessage(message)
 
         if bot_message.command_name == "hl":
             if bot_message.highlow_get_hint_number() <= 50:
