@@ -83,9 +83,12 @@ class BotMessage:
             pass
 
         for command in COMMANDS.keys():
-            if str(self.message.reference.message_id) in message_ids[command]:
-                self.load_message_data = True
-                self.command_name = command
+            try:
+                if str(self.message.reference.message_id) in message_ids[command]:
+                    self.load_message_data = True
+                    self.command_name = command
+            except:
+                pass
 
         if self.load_message_data:
             self.loaded_data_dict = self.get_message_data()
