@@ -147,8 +147,9 @@ costs = {}
 running = True
 buy_lifesavers = True
 
-active_commands = [command for command in COMMANDS.keys()]
-active_commands.remove("crime")
+# Full command list template
+# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell"]
 
 client = discord.Client()
 
