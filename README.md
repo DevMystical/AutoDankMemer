@@ -15,6 +15,7 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Uses `fish` and detects and plays the legendary fish minigame.
 - Hunts for items and automatically sells sellables.
 - Automatically purchases lifesavers when you die.
+- Plays `trivia` and gets the correct answer for 99% of questions.
 
 - Logs profits and costs using a fairly advanced parsing system.
 - Bot command system for management and statistics.
@@ -23,7 +24,10 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Supports pressing buttons and using discord interactions.
 - Easily move the current operational channel to other servers or channels.
 
-Note: The bot has the capability to use `crime` but it is disabled in the source code because it causes so many deaths and the lifesavers get extremely expensive. Modify the variable `active_commands` at its definition to re-enable it.
+Notes: 
+
+- The bot has the capability to use `crime` but it is disabled in the source code because it causes so many deaths and the lifesavers get extremely expensive. Modify the variable `active_commands` at its definition to re-enable it.
+- The `trivia` command knows almost all of the questions used by API which Dank Memer uses. However, there are 30-40 questions missing out of roughly 4,000.
 
 ## Commands
 
@@ -59,3 +63,4 @@ Note: The bot has the capability to use `crime` but it is disabled in the source
 - Place your own user token in the space which reads `USER_TOKEN`.
 - Enable discord developer mode if it is not already on.
 - Copy the Channel ID where you want to start out and put it, as a string, in `CHANNEL_ID`. (This can be changed once the bot is running, see the list of commands for more details)
+- Optionally, include the `trivia.json` in the same folder as the script is running to let it always get trivia questions correct.
