@@ -399,10 +399,10 @@ async def on_message(message: discord.Message):
             running = False
             await asyncio.sleep(10)
             try:
-                post_message("pls with 5000")
+                post_message("pls with 15000")
                 await asyncio.sleep(5)
-                post_message("pls buy padlock")
-                log("Purchased a padlock.", LogType.ROBBERY)
+                post_message("pls buy padlock 3")
+                log("No padlocks remaining, purchased three.", LogType.ROBBERY)
                 await asyncio.sleep(5)
                 padlock_use_msg_ids.append(post_message("pls use padlock"))
             except:
@@ -420,7 +420,7 @@ async def on_message(message: discord.Message):
                     post_message(f"pls with {(3 - padlock_quantity_remaining) * 5000}")
                     await asyncio.sleep(5)
                     post_message(f"pls buy padlock {3 - padlock_quantity_remaining}")
-                    log("Purchased a padlock.", LogType.ROBBERY)
+                    log("Purchased  padlock.", LogType.ROBBERY)
                     await asyncio.sleep(5)
             except:
                 pass
