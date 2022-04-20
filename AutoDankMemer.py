@@ -1,4 +1,4 @@
-import discord, requests, json, time, random, string, asyncio
+import discord, requests, json, time, random, string, asyncio, base64, os
 from discord.ext import tasks
 
 class LogType:
@@ -15,11 +15,17 @@ def log(message, log_type):
 log("DankMemerBot - By Mystical (2022)", LogType.INFO)
 
 def get_guild_id(channel_id):
-    return requests.get(f"https://discord.com/api/v9/channels/{channel_id}", headers={"Authorization": f"Bot {BOT_TOKEN}"}).json()["guild_id"]
+    try:
+        return requests.get(f"https://discord.com/api/v9/channels/{channel_id}", headers={"Authorization": f"Bot {BOT_TOKEN}"}).json()["guild_id"]
+    except KeyError:
+        return None
 
 def get_my_information(token):
-    data = requests.get(f"https://discord.com/api/v9/users/@me", headers={"Authorization": token}).json()
-    return data["id"], data["username"]
+    try:
+        data = requests.get(f"https://discord.com/api/v9/users/@me", headers={"Authorization": token}).json()
+        return data["id"], data["username"]
+    except KeyError:
+        return None
 
 try:
     config = json.load(open("BotConfig.json"))
@@ -34,7 +40,29 @@ GUILD_ID = get_guild_id(CHANNEL_ID)
 MY_ID, NAME = get_my_information(USER_TOKEN)
 DANK_MEMER_ID = 270904126974590976
 
-COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 150, "crime": 45}
+if GUILD_ID is None:
+    log("That channel does not exist or is not accessible.", LogType.ERROR)
+    exit()
+if MY_ID is None or NAME is None:
+    log("That token is invalid or is not reachable.", LogType.ERROR)
+    exit()
+
+b64 = lambda s: base64.b64decode(s).decode('utf-8')
+if not "trivia.json" in os.listdir():
+    TRIVIA_DATA = None
+    log("File trivia.json was not found, random trivia answers will be selected.", LogType.INFO)
+else:
+    TRIVIA_DATA = {}
+    with open("trivia.json") as f:
+        trivia = json.load(f)
+    for category, question_list in trivia.items():
+        cat_name = b64(category)
+        if not cat_name in TRIVIA_DATA:
+            TRIVIA_DATA[cat_name] = {}
+        for question in question_list:
+            TRIVIA_DATA[cat_name][b64(question["question"])] = b64(question["answer"])
+
+COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 150, "crime": 45, "trivia": 20}
 CRIME_DEATH_CHUNKS = ["shot", "killed", "choked to death", "MURDERED", "died", "death penalty"]
 SEARCH_DEATH_CHUNKS = ["killing", "died", "shot", "killed", "mutant", "catfished", "and bit you.", "parked", "infectious disease ward", 
     "sent chills down your spine", "burned to death", "TO DEATH", "hit by a car LOL", "Epsteined"]
@@ -45,11 +73,15 @@ def post_message(content):
     res = requests.post(f"https://discord.com/api/v9/channels/{CHANNEL_ID}/messages", headers={"Authorization": USER_TOKEN}, json={"content": content})
     return res.json()["id"] if "id" in res.json() else False
 
-def get_ideal_search_id(data):
+def get_label_mapping_and_list(data):
     labels, label_list = {}, []
     for component in data["components"][0]["components"]:
         labels[component["label"]] = component["custom_id"]
         label_list.append(component["label"])
+    return labels, label_list
+
+def get_ideal_search_id(data):
+    labels, label_list = get_label_mapping_and_list(data)
     to_delete = []
     for label in labels.keys():
         if not label in SEARCH_PRIORITY:
@@ -65,6 +97,16 @@ def get_ideal_search_id(data):
             selected = SEARCH_PRIORITY.index(label)
     return labels[SEARCH_PRIORITY[selected]]
 
+def get_correct_trivia_id(data, question, category):
+    labels, label_list = get_label_mapping_and_list(data)
+    if not (category in TRIVIA_DATA and question in TRIVIA_DATA[category]):
+        return None
+    correct_answer = TRIVIA_DATA[category][question]
+    if correct_answer in label_list:
+        return labels[correct_answer]
+    else:
+        return None
+    
 class BotMessage:
     def __init__(self, message):
         self.message = message
@@ -128,6 +170,12 @@ class BotMessage:
     def highlow_get_hint_number(self):
         return int(self.loaded_data_dict["embeds"][0]["description"].split("**")[1])
     
+    def trivia_get_question(self):
+        return self.loaded_data_dict["embeds"][0]["description"].split("**")[1].split("**")[0]
+    
+    def trivia_get_category(self):
+        return self.loaded_data_dict["embeds"][0]["fields"][1]["value"].replace("`", "")
+    
     def add_and_log(self, command_name, value):
         if not command_name in earnings:
             earnings[command_name] = 0
@@ -148,8 +196,8 @@ running = True
 buy_lifesavers = True
 
 # Full command list template
-# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell"]
+# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia"]
 
 client = discord.Client()
 
@@ -162,7 +210,7 @@ async def command_start_loop():
         if not command in use_counts.keys():
             use_counts[command] = 0
         if not command in next_use.keys():
-            next_use[command] = time.time() + random.randint(0, 25)
+            next_use[command] = time.time() + random.randint(0, 15)
         if time.time() > next_use[command]:
             next_use[command] = time.time() + cooldown + 3
             use_counts[command] += 1
@@ -341,7 +389,14 @@ async def on_message(message: discord.Message):
             bot_message.press_random_button(5)
 
         elif bot_message.command_name == "trivia":
-            bot_message.press_random_button(4)
+            question = bot_message.trivia_get_question()
+            category = bot_message.trivia_get_category()
+            target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category) # TODO
+            await asyncio.sleep(random.randint(2, 5))
+            if target_id is None:
+                bot_message.press_random_button(4)
+            else:
+                bot_message.press_button(target_id)
         
         elif bot_message.command_name == "sell":
             if "Multi Bonus" in bot_message.dumped_data:
