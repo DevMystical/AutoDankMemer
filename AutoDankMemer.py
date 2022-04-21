@@ -559,6 +559,8 @@ async def on_message_edit(_, message: discord.Message):
                         break
                 value = int(buffer.replace(",", ""))
                 bot_message.add_and_log("Crime", value)
+            if "Bank Note" in bot_message.dumped_data:
+                post_message("pls use banknote 1")
         
         elif bot_message.command_name == "search":
             if not "Guess you didn't" in message.content:
