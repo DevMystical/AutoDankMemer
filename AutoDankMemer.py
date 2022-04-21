@@ -187,7 +187,7 @@ class BotMessage:
         if not command_name in earnings:
             earnings[command_name] = 0
         earnings[command_name] += value
-        log(f"{command_name} -> {value} ({sum(earnings.values()) - sum(costs.values())})", LogType.EARN)
+        log(f"{command_name.ljust(9)} -> {str(value).ljust(6)} ({sum(earnings.values()) - sum(costs.values())})", LogType.EARN)
     
     def remove_cost(self, command_name, cost):
         if not command_name in costs:
@@ -536,6 +536,8 @@ async def on_message_edit(_, message: discord.Message):
                 value = int(bot_message.dumped_data.split("**\\u23e3 ")[1].split("**")[0].replace(",", ""))
                 if value > 0:
                     bot_message.add_and_log("Postmemes", value)
+            if "Bank Note" in bot_message.dumped_data:
+                post_message("pls use banknote 1")
         
         elif bot_message.command_name == "crime":
             for message_chunk in CRIME_DEATH_CHUNKS:
