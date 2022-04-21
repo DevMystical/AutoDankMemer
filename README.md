@@ -21,6 +21,7 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Automatically deposits into the bank.
 - Detects if you are robbed and uses a padlock.
 - Buys more padlocks if you go under 3 remaining.
+- Uses Bank Notes if you find them while fishing, hunting, or posting memes.
 
 ### Backend
 
