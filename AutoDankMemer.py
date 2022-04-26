@@ -457,7 +457,7 @@ async def on_message(message: discord.Message):
         elif bot_message.command_name == "trivia":
             question = bot_message.trivia_get_question()
             category = bot_message.trivia_get_category()
-            target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category) # TODO
+            target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category)
             await asyncio.sleep(random.randint(2, 5))
             if target_id is None:
                 bot_message.press_random_button(4)
