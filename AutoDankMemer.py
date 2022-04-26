@@ -370,6 +370,9 @@ async def on_message(message: discord.Message):
                         embed.add_field(name="**Cost Breakdown**", value=costs_bd, inline=False)
                     embed.set_footer(text="Created by Mystical")
                     await message.channel.send(embed=embed)
+                
+                else:
+                    await show_help()
 
     for item in STEAL_FLAGS:
         if item in message.content.lower():
