@@ -15,7 +15,8 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Posts memes.
 - Uses `dig` with automatic shovel purchasing.
 - Uses `fish` and detects and plays the legendary fish minigame.
-- Hunts for items and automatically sells sellables.
+- Uses `hunt` and detects and plays the dragon minigame.
+- Automatically sells sellable items.
 - Automatically purchases lifesavers when you die.
 - Plays `trivia` and gets the correct answer for 99% of questions.
 - Automatically deposits into the bank.
