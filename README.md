@@ -5,6 +5,7 @@ Runs a discord.py session on a bot account and sends messages using a user accou
 
 PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot does absolutely have an automatic blacklist system which detects spam. It is recommended for you to only use this bot periodically. Leaving running for more than six hours is HIGHLY discouraged and done completely at your own risk.
 
+fork changes are, for now, untested lol
 ## Features
 
 ### Commands
@@ -23,6 +24,7 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Detects if you are robbed and uses a padlock.
 - Buys more padlocks if you go under 3 remaining.
 - Uses Bank Notes if you find them while fishing, hunting, or posting memes.
+- Gets a job if you don't have one, and works one if you do.
 
 ### Backend
 
