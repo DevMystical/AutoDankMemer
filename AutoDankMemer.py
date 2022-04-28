@@ -63,7 +63,7 @@ else:
         for question in question_list:
             TRIVIA_DATA[cat_name][b64(question["question"])] = b64(question["answer"])
 
-COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300}
+COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300, "work": 3600}
 CRIME_DEATH_CHUNKS = ["shot", "killed", "choked to death", "MURDERED", "died", "death penalty"]
 SEARCH_DEATH_CHUNKS = ["killing", "died", "shot", "killed", "mutant", "catfished", "and bit you.", "parked", "infectious disease ward", 
     "sent chills down your spine", "burned to death", "TO DEATH", "hit by a car LOL", "Epsteined"]
@@ -205,8 +205,8 @@ running = True
 buy_lifesavers = True
 
 # Full command list template, with crime enabled
-# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max"]
+# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max", "work"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "trivia", "dep max", "work"]
 
 client = discord.Client()
 
@@ -501,6 +501,12 @@ async def on_message(message: discord.Message):
                 log(f"BOUGHT SHOVEL WHILE DIGGING #{use_counts['dig']}", LogType.BUY)
                 post_message("pls buy shovel")
                 bot_message.remove_cost("Dig", 25000)
+            elif "Hit the Ball!" in message.content:
+                target = message.content.split("\n")[2]
+                if target.split(":soccer:")[0] == "":
+                    bot_message.press_button_at_index(2)
+                else:
+                    bot_message.press_button_at_index(0)
         
         elif bot_message.command_name == "hunt":
             if "the dragon ate you" in message.content:
@@ -519,7 +525,35 @@ async def on_message(message: discord.Message):
                     bot_message.press_button_at_index(0)
             elif "Bank Note" in message.content:
                 post_message("pls use banknote 1")
-    except:
+        
+        elif bot_message.command_name == "work":
+            if "Your salary has increased" in message.content:
+                print ('pls work')
+            elif "You don't currently have a job to work at" in message.content:
+                print ('pls work babysitter')
+                print ('pls work')
+            elif "Hit the Ball!" in message.content:
+                target = message.content.split("\n")[2]
+                if target.split(":soccer:")[0] == "":
+                    bot_message.press_button_at_index(2)
+                else:
+                    bot_message.press_button_at_index(0)
+            elif "Dunk the ball!" in message.content:
+                target = message.content.split("\n")[1]
+                emoji = ":basketball:"
+                if target.split(emoji)[0] == "       ":
+                    bot_message.press_button_at_index(1)
+                elif target.split(emoji)[0] == "":
+                    bot_message.press_button_at_index(0)
+                else:
+                    bot_message.press_button_at_index(2)
+            elif "Repeat Order" in message.content:
+                bot_message.press_button_at_index(0)
+            elif "What color was next to the word" in message.content:
+                bot_message.press_button_at_index(0)
+            elif "What was the emoji?" in message.content:
+                bot_message.press_button_at_index(0)
+    except: 
         pass
 
 @client.event
@@ -592,6 +626,11 @@ async def on_message_edit(_, message: discord.Message):
             if "You got that answer correct" in bot_message.dumped_data:
                 value = int(bot_message.dumped_data.split("you also got ")[1].split(" coins")[0].replace(",", ""))
                 bot_message.add_and_log("Trivia", value)
+
+        elif bot_message.command_name == "work":
+            if "You were given" in bot_message.dumped_data:
+                value = int(bot_message.dumped_data.split("You were given ")[1].split(" for")[0].replace(",", ""))
+                bot_message.add_and_log("Work", value)
     except:
         pass
 
