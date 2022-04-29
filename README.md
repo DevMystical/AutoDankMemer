@@ -5,7 +5,7 @@ Runs a discord.py session on a bot account and sends messages using a user accou
 
 PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot does absolutely have an automatic blacklist system which detects spam. It is recommended for you to only use this bot periodically. Leaving running for more than six hours is HIGHLY discouraged and done completely at your own risk.
 
-Fork adds 'pls work', but it is not fully complete yet. If you use it, feedback is highly appreciated.
+Fork adds 'pls work', but it is not fully complete/tested yet. If you use it, feedback is highly appreciated.
 
 ## Features
 
