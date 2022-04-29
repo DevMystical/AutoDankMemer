@@ -1,3 +1,4 @@
+from cProfile import label
 import discord, requests, json, time, random, string, asyncio, base64, os
 from discord.ext import tasks
 
@@ -206,7 +207,7 @@ buy_lifesavers = True
 
 # Full command list template, with crime enabled
 # active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max", "work"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "trivia", "dep max", "work"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max", "work"]
 
 client = discord.Client()
 
@@ -548,11 +549,22 @@ async def on_message(message: discord.Message):
                 else:
                     bot_message.press_button_at_index(2)
             elif "Repeat Order" in message.content:
-                bot_message.press_button_at_index(0)
-            elif "What color was next to the word" in message.content:
-                bot_message.press_button_at_index(0)
-            elif "What was the emoji?" in message.content:
-                bot_message.press_button_at_index(0)
+                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].split()[0].replace("", ",")]
+                labels, label_list = get_label_mapping_and_list(bot_message)
+                for item in work_list:
+                    bot_message.press_button(labels)
+            elif "color" in message.content:
+                work_copy = [bot_message.dumped_data.split("Remember words order! ")[1]]
+                labels, label_list = get_label_mapping_and_list(bot_message)
+                for item in label_list:
+                    if item == work_copy:
+                        bot_message.press_button(item)
+            elif "emoji closely!" in message.content:
+                work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1]]
+                labels, label_list = get_label_mapping_and_list(bot_message)
+                for item in label_list:
+                    if item == work_copy:
+                        bot_message.press_button(item)
     except: 
         pass
 
