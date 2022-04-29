@@ -1,4 +1,3 @@
-from cProfile import label
 import discord, requests, json, time, random, string, asyncio, base64, os
 from discord.ext import tasks
 
