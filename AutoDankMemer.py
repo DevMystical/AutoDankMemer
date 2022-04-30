@@ -63,7 +63,7 @@ else:
         for question in question_list:
             TRIVIA_DATA[cat_name][b64(question["question"])] = b64(question["answer"])
 
-COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300, "work": 3600}
+COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300, "work": 360}
 CRIME_DEATH_CHUNKS = ["shot", "killed", "choked to death", "MURDERED", "died", "death penalty"]
 SEARCH_DEATH_CHUNKS = ["killing", "died", "shot", "killed", "mutant", "catfished", "and bit you.", "parked", "infectious disease ward", 
     "sent chills down your spine", "burned to death", "TO DEATH", "hit by a car LOL", "Epsteined"]
@@ -528,10 +528,10 @@ async def on_message(message: discord.Message):
         
         elif bot_message.command_name == "work":
             if "Your salary has increased" in message.content:
-                print ('pls work')
+                post_message('pls work')
             elif "You don't currently have a job to work at" in message.content:
-                print ('pls work babysitter')
-                print ('pls work')
+                post_message('pls work babysitter')
+                post_message('pls work')
             elif "Hit the Ball!" in message.content:
                 target = message.content.split("\n")[2]
                 if target.split(":soccer:")[0] == "":
@@ -550,20 +550,24 @@ async def on_message(message: discord.Message):
             elif "Repeat Order" in message.content:
                 work_list = [bot_message.dumped_data.split("Remember words order! ")[1].split()[0].replace("", ",")]
                 labels, label_list = get_label_mapping_and_list(bot_message)
+                time.sleep(6.9)
                 for item in work_list:
-                    bot_message.press_button(labels)
+                    if item in label_list:
+                        bot_message.press_button_at_index(label_list.index(item))
             elif "color" in message.content:
-                work_copy = [bot_message.dumped_data.split("Remember words order! ")[1]]
+                work_copy = [bot_message.dumped_data.split("selected word. ")[1]]
                 labels, label_list = get_label_mapping_and_list(bot_message)
-                for item in label_list:
-                    if item == work_copy:
-                        bot_message.press_button(item)
+                time.sleep(6.9)
+                for item in work_copy:
+                    if item in label_list:
+                        bot_message.press_button_at_index(label_list.index(item))
             elif "emoji closely!" in message.content:
                 work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1]]
                 labels, label_list = get_label_mapping_and_list(bot_message)
-                for item in label_list:
-                    if item == work_copy:
-                        bot_message.press_button(item)
+                time.sleep(6.9)
+                for item in work_copy:
+                    if item in label_list:
+                        bot_message.press_button_at_index(label_list.index(item))
     except: 
         pass
 
