@@ -430,16 +430,38 @@ async def on_message(message: discord.Message):
                 pass
             running = True
 
-    elif "Attack the boss by clicking" in message.content:
-        try:
-            while True:
-                status_code = bot_message.press_button_at_index(0)
-                await asyncio.sleep(0.5)
-                if not status_code == 204:
-                    break
-        except:
-            pass
-    
+    elif 'event' in message.content:
+        if "Attack the boss by clicking" in message.content:
+            try:
+                while True:
+                    status_code = bot_message.press_button_at_index(0)
+                    bot_message.press_button_at_index(0)
+                    await asyncio.sleep(0.5)
+                    if not status_code == 204:
+                        break
+            except:
+                pass
+        
+        if "Trivia" in message.content:
+            question = bot_message.trivia_get_question()
+            category = bot_message.trivia_get_category()
+            target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category)
+            await asyncio.sleep(random.randint(2, 5))
+            if target_id is None:
+                bot_message.press_random_button(4)
+            else:
+                bot_message.press_button(target_id)
+
+        if "secret number" in message.content:
+            if bot_message.highlow_get_hint_number() <= 50:
+                bot_message.press_button_at_index(2)
+            else:
+                bot_message.press_button_at_index(0)
+
+        if "Results for" in message.content:
+            value = int(bot_message.dumped_data.split("⏣")[1].split("and")[0])
+            bot_message.add_and_log("Event", value)
+
     try:
 
         if bot_message.command_name == "hl":
@@ -533,13 +555,13 @@ async def on_message(message: discord.Message):
                 post_message('pls work babysitter')
                 post_message('pls work')
             elif "Hit the Ball!" in message.content:
-                target = message.content.split("\n")[2]
+                target = message.content
                 if target.split(":soccer:")[0] == "":
                     bot_message.press_button_at_index(2)
                 else:
                     bot_message.press_button_at_index(0)
             elif "Dunk the ball!" in message.content:
-                target = message.content.split("\n")[1]
+                target = message.content
                 emoji = ":basketball:"
                 if target.split(emoji)[0] == "       ":
                     bot_message.press_button_at_index(1)
@@ -548,23 +570,23 @@ async def on_message(message: discord.Message):
                 else:
                     bot_message.press_button_at_index(2)
             elif "Repeat Order" in message.content:
-                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].split()[0].replace("", ",")]
+                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].replace("", ", ")]
                 labels, label_list = get_label_mapping_and_list(bot_message)
-                time.sleep(6.9)
+                time.sleep(6)
                 for item in work_list:
                     if item in label_list:
                         bot_message.press_button_at_index(label_list.index(item))
             elif "color" in message.content:
                 work_copy = [bot_message.dumped_data.split("selected word. ")[1]]
                 labels, label_list = get_label_mapping_and_list(bot_message)
-                time.sleep(6.9)
+                time.sleep(6)
                 for item in work_copy:
                     if item in label_list:
                         bot_message.press_button_at_index(label_list.index(item))
             elif "emoji closely!" in message.content:
                 work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1]]
                 labels, label_list = get_label_mapping_and_list(bot_message)
-                time.sleep(6.9)
+                time.sleep(6)
                 for item in work_copy:
                     if item in label_list:
                         bot_message.press_button_at_index(label_list.index(item))
