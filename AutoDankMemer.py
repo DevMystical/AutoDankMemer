@@ -81,6 +81,7 @@ def get_label_mapping_and_list(data):
     for component in data["components"][0]["components"]:
         labels[component["label"]] = component["custom_id"]
         label_list.append(component["label"])
+        print(label_list)
     return labels, label_list
 
 def get_ideal_search_id(data):
@@ -96,7 +97,7 @@ def get_ideal_search_id(data):
         return None
     selected = 100
     for label in label_list:
-        if SEARCH_PRIORITY.index(label) < selected:
+        if SEARCH_PRIORITY.index(label) < selected: #set it to not wait to expire when no priorities
             selected = SEARCH_PRIORITY.index(label)
     return labels[SEARCH_PRIORITY[selected]]
 
@@ -206,7 +207,7 @@ buy_lifesavers = True
 
 # Full command list template, with crime enabled
 # active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max", "work"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max", "work"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "trivia", "dep max"]
 
 client = discord.Client()
 
@@ -430,37 +431,40 @@ async def on_message(message: discord.Message):
                 pass
             running = True
 
-    elif 'event' in message.content:
-        if "Attack the boss by clicking" in message.content:
-            try:
-                while True:
-                    status_code = bot_message.press_button_at_index(0)
-                    bot_message.press_button_at_index(0)
-                    await asyncio.sleep(0.5)
-                    if not status_code == 204:
-                        break
-            except:
-                pass
+    elif "EVENT" in message.content:
+        if "Color Match" in message.content:
+            return
+        else:
+            if "Attack the boss by clicking" in message.content:
+                try:
+                    while True:
+                        status_code = bot_message.press_button_at_index(0)
+                        bot_message.press_button_at_index(0)
+                        await asyncio.sleep(0.5)
+                        if not status_code == 204:
+                            break
+                except:
+                    pass
         
-        if "Trivia" in message.content:
-            question = bot_message.trivia_get_question()
-            category = bot_message.trivia_get_category()
-            target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category)
-            await asyncio.sleep(random.randint(2, 5))
-            if target_id is None:
-                bot_message.press_random_button(4)
-            else:
-                bot_message.press_button(target_id)
+            elif "Trivia" in message.content:
+                question = bot_message.trivia_get_question()
+                category = bot_message.trivia_get_category()
+                target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category)
+                await asyncio.sleep(random.randint(2, 5))
+                if target_id is None:
+                    bot_message.press_random_button(4)
+                else:
+                    bot_message.press_button(target_id)
 
-        if "secret number" in message.content:
-            if bot_message.highlow_get_hint_number() <= 50:
-                bot_message.press_button_at_index(2)
-            else:
-                bot_message.press_button_at_index(0)
+            elif "secret number" in message.content:
+                if bot_message.highlow_get_hint_number() <= 50:
+                    bot_message.press_button_at_index(2)
+                else:
+                    bot_message.press_button_at_index(0)
 
-        if "Results for" in message.content:
-            value = int(bot_message.dumped_data.split("⏣")[1].split("and")[0])
-            bot_message.add_and_log("Event", value)
+            elif "Results for" in message.content:
+                value = int(bot_message.dumped_data.split("⏣")[1].split("and")[0])
+                bot_message.add_and_log("Event", value)
 
     try:
 
@@ -549,11 +553,9 @@ async def on_message(message: discord.Message):
                 post_message("pls use banknote 1")
         
         elif bot_message.command_name == "work":
-            if "Your salary has increased" in message.content:
-                post_message('pls work')
-            elif "You don't currently have a job to work at" in message.content:
+            time.sleep(1)
+            if "You don't currently have a job to work at" in message.content:
                 post_message('pls work babysitter')
-                post_message('pls work')
             elif "Hit the Ball!" in message.content:
                 target = message.content
                 if target.split(":soccer:")[0] == "":
@@ -570,25 +572,31 @@ async def on_message(message: discord.Message):
                 else:
                     bot_message.press_button_at_index(2)
             elif "Repeat Order" in message.content:
-                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].replace("", ", ")]
-                labels, label_list = get_label_mapping_and_list(bot_message)
+                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].replace(" ", ", ")]
                 time.sleep(6)
+                print(work_list)
+                label_list = get_label_mapping_and_list(bot_message)
+                print(label_list)
                 for item in work_list:
                     if item in label_list:
                         bot_message.press_button_at_index(label_list.index(item))
             elif "color" in message.content:
-                work_copy = [bot_message.dumped_data.split("selected word. ")[1]]
-                labels, label_list = get_label_mapping_and_list(bot_message)
-                time.sleep(6)
+                work_copy = [bot_message.dumped_data.split("selected word. ")[1].split(":").split()]
+                time.sleep(6) #labels only appear after the time
+                print(work_copy)
+                label_list = get_label_mapping_and_list(bot_message) #REALLY BROKEN, NOT HOW THIS PART WORKS-need to associate colors with 
+                print(label_list)
                 for item in work_copy:
-                    if item in label_list:
-                        bot_message.press_button_at_index(label_list.index(item))
+                    if item in bot_message.dumped_data:
+                        bot_message.press_button(label_list.index(item))
             elif "emoji closely!" in message.content:
-                work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1]]
-                labels, label_list = get_label_mapping_and_list(bot_message)
+                work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1].split()]
                 time.sleep(6)
+                print(work_copy)
+                label_list = get_label_mapping_and_list(bot_message)
+                print(label_list)
                 for item in work_copy:
-                    if item in label_list:
+                    if item in label_list: #remove this for being unnecessary? both lists contain same parts.
                         bot_message.press_button_at_index(label_list.index(item))
     except: 
         pass
@@ -662,6 +670,7 @@ async def on_message_edit(_, message: discord.Message):
         elif bot_message.command_name == "trivia":
             if "You got that answer correct" in bot_message.dumped_data:
                 value = int(bot_message.dumped_data.split("you also got ")[1].split(" coins")[0].replace(",", ""))
+                print(value)
                 bot_message.add_and_log("Trivia", value)
 
         elif bot_message.command_name == "work":
