@@ -81,7 +81,6 @@ def get_label_mapping_and_list(data):
     for component in data["components"][0]["components"]:
         labels[component["label"]] = component["custom_id"]
         label_list.append(component["label"])
-        print(label_list)
     return labels, label_list
 
 def get_ideal_search_id(data):
@@ -207,7 +206,7 @@ buy_lifesavers = True
 
 # Full command list template, with crime enabled
 # active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max", "work"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "trivia", "dep max"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max", "work"]
 
 client = discord.Client()
 
@@ -557,44 +556,41 @@ async def on_message(message: discord.Message):
             if "You don't currently have a job to work at" in message.content:
                 post_message('pls work babysitter')
             elif "Hit the Ball!" in message.content:
-                target = message.content
-                if target.split(":soccer:")[0] == "":
+                target = message.content.split("\n")[2]
+                if target.split(":levitate:")[0] == "":
                     bot_message.press_button_at_index(2)
                 else:
                     bot_message.press_button_at_index(0)
             elif "Dunk the ball!" in message.content:
-                target = message.content
+                target = message.content.split("\n")[2]
                 emoji = ":basketball:"
                 if target.split(emoji)[0] == "       ":
                     bot_message.press_button_at_index(1)
-                elif target.split(emoji)[0] == "":
+                elif target.split(emoji)[1] == "":
                     bot_message.press_button_at_index(0)
                 else:
                     bot_message.press_button_at_index(2)
             elif "Repeat Order" in message.content:
-                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].replace(" ", ", ")]
-                time.sleep(6)
-                print(work_list)
+                work_list = [bot_message.dumped_data.split("Remember words order!")[1].split()]
+                time.sleep(5)
                 label_list = get_label_mapping_and_list(bot_message)
-                print(label_list)
                 for item in work_list:
                     if item in label_list:
                         bot_message.press_button_at_index(label_list.index(item))
             elif "color" in message.content:
-                work_copy = [bot_message.dumped_data.split("selected word. ")[1].split(":").split()]
-                time.sleep(6) #labels only appear after the time
-                print(work_copy)
+                work_copy = [bot_message.dumped_data.split("selected word.")[1].split(":").replace(":","")]
+                time.sleep(5) #labels only appear after the time
+                word=bot_message.dumped_data.split("next to the word")[1]
+                word2=str(label_list[0])
                 label_list = get_label_mapping_and_list(bot_message) #REALLY BROKEN, NOT HOW THIS PART WORKS-need to associate colors with 
-                print(label_list)
                 for item in work_copy:
-                    if item in bot_message.dumped_data:
-                        bot_message.press_button(label_list.index(item))
+                    if item == word:
+                        if item in label_list:
+                            bot_message.press_button(str(work_copy[word-1]))
             elif "emoji closely!" in message.content:
-                work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1].split()]
-                time.sleep(6)
-                print(work_copy)
+                work_copy = [bot_message.dumped_data.split("Look at the emoji closely!")[1].split()]
+                time.sleep(5)
                 label_list = get_label_mapping_and_list(bot_message)
-                print(label_list)
                 for item in work_copy:
                     if item in label_list: #remove this for being unnecessary? both lists contain same parts.
                         bot_message.press_button_at_index(label_list.index(item))
@@ -670,7 +666,6 @@ async def on_message_edit(_, message: discord.Message):
         elif bot_message.command_name == "trivia":
             if "You got that answer correct" in bot_message.dumped_data:
                 value = int(bot_message.dumped_data.split("you also got ")[1].split(" coins")[0].replace(",", ""))
-                print(value)
                 bot_message.add_and_log("Trivia", value)
 
         elif bot_message.command_name == "work":
