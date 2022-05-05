@@ -1,5 +1,6 @@
 {
     "BOT_TOKEN": "",
     "USER_TOKEN": "",
-    "CHANNEL_ID": ""
+    "CHANNEL_ID": "",
+    "AUTHORIZED_USERS": []
 }
