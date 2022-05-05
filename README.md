@@ -32,6 +32,7 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 - Although there is no documentation, it is decently modular and allows for adding commands easily.
 - Supports pressing buttons and using discord interactions.
 - Easily move the current operational channel to other servers or channels.
+- Option to allow other accounts to control the bot so you can farm on an alt but control it with your main account.
 
 ### Notes
 
@@ -66,12 +67,13 @@ PLEASE NOTE: While it may seem too easy to farm commands in Dank Memer, the bot 
 
 ## Configuration
 
-- Open `AutoDankMemer.py` and go to the python list on line `209`. Edit it and remove any modules you don't want to use.
-- Keep the list on line #208 intact and use it as a template. `"crime"` is disabled on line `209` by default.
+- Open `AutoDankMemer.py` and go to the python list on line `210`. Edit it and remove any modules you don't want to use.
+- Keep the list on line #209 intact and use it as a template. `"crime"` is disabled on line `210` by default.
 - Open `BotConfig.json`.
 - Have a bot in a server with yourself and Dank Memer.
 - Place the bot's token in the space which reads `BOT_TOKEN`.
 - Place your own user token in the space which reads `USER_TOKEN`.
 - Enable discord developer mode if it is not already on.
 - Copy the Channel ID where you want to start out and put it, as a string, in `CHANNEL_ID`. (This can be changed once the bot is running, see the list of commands for more details)
+- If you have another account that you want to use to control the bot, put it as a string inside of `AUTHORIZED_USERS` which is a list. The account of `USER_TOKEN` will always be allowed to use the bot so do not add it to this list.
 - Optionally, include the `trivia.json` in the same folder as the script is running to let it always get trivia questions correct.
