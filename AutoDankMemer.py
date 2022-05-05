@@ -234,7 +234,6 @@ async def on_ready():
     log(f"Logged in as {client.user.display_name}#{client.user.discriminator} ({client.user.id})", LogType.INFO)
     log(f"Listening for commands on Channel ID {CHANNEL_ID}" , LogType.INFO)
     padlock_use_msg_ids.append(post_message("pls use padlock"))
-    await client.change_presence(activity=discord.Game(name="Martin is a nigger"))
     await asyncio.sleep(3)
     command_start_loop.start()
 
