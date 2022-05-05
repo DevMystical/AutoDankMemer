@@ -161,7 +161,7 @@ class BotMessage:
         if custom_id == None: return 204
         payload = {
             "type": 3,
-            "nonce": str((int(time.time())*1000-1420070400000)*4194304),
+            "nonce": str((int(time.time()) * 1000 - 1420070400000) * 4194304),
             "session_id": "".join(random.choices(string.ascii_letters + string.digits, k=16)),
             "guild_id": GUILD_ID,
             "channel_id": CHANNEL_ID,
