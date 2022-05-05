@@ -39,6 +39,7 @@ USER_TOKEN = config["USER_TOKEN"]
 CHANNEL_ID = config["CHANNEL_ID"]
 GUILD_ID = get_guild_id(CHANNEL_ID)
 MY_ID, NAME, MY_DISCRIM = get_my_information(USER_TOKEN)
+AUTHORIZED_USERS = config["AUTHORIZED_USERS"] + [MY_ID]
 DANK_MEMER_ID = 270904126974590976
 
 if GUILD_ID is None:
@@ -63,7 +64,7 @@ else:
         for question in question_list:
             TRIVIA_DATA[cat_name][b64(question["question"])] = b64(question["answer"])
 
-COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300}
+COMMANDS = {"hl": 32, "beg": 35, "search": 30, "postmemes": 40, "dig": 40, "fish": 40, "hunt": 40, "sell": 300, "crime": 45, "trivia": 20, "dep max": 300, "work": 3660}
 CRIME_DEATH_CHUNKS = ["shot", "killed", "choked to death", "MURDERED", "died", "death penalty"]
 SEARCH_DEATH_CHUNKS = ["killing", "died", "shot", "killed", "mutant", "catfished", "and bit you.", "parked", "infectious disease ward", 
     "sent chills down your spine", "burned to death", "TO DEATH", "hit by a car LOL", "Epsteined"]
@@ -205,8 +206,8 @@ running = True
 buy_lifesavers = True
 
 # Full command list template, with crime enabled
-# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max"]
-active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max"]
+# active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "crime", "trivia", "dep max", "work"]
+active_commands = ["hl", "beg", "search", "postmemes", "dig", "fish", "hunt", "sell", "trivia", "dep max", "work"]
 
 client = discord.Client()
 
@@ -233,13 +234,14 @@ async def on_ready():
     log(f"Logged in as {client.user.display_name}#{client.user.discriminator} ({client.user.id})", LogType.INFO)
     log(f"Listening for commands on Channel ID {CHANNEL_ID}" , LogType.INFO)
     padlock_use_msg_ids.append(post_message("pls use padlock"))
+    await client.change_presence(activity=discord.Game(name="Martin is a nigger"))
     await asyncio.sleep(3)
     command_start_loop.start()
 
 @client.event
 async def on_message(message: discord.Message):
     global running, buy_lifesavers, CHANNEL_ID, GUILD_ID
-    if str(message.author.id) == MY_ID:
+    if str(message.author.id) in AUTHORIZED_USERS:
         if message.content.split(" ")[0] == "dmbot":
             args = message.content.split(" ")[1:]
 
@@ -370,7 +372,7 @@ async def on_message(message: discord.Message):
                         embed.add_field(name="**Cost Breakdown**", value=costs_bd, inline=False)
                     embed.set_footer(text="Created by Mystical")
                     await message.channel.send(embed=embed)
-                
+
                 else:
                     await show_help()
 
@@ -429,18 +431,37 @@ async def on_message(message: discord.Message):
             except:
                 pass
             running = True
-
-    elif "Attack the boss by clicking" in message.content:
-        try:
-            while True:
-                status_code = bot_message.press_button_at_index(0)
-                await asyncio.sleep(0.5)
-                if not status_code == 204:
-                    break
-        except:
-            pass
     
     try:
+
+        if "event" in message.content:
+            if "Attack the boss by clicking" in message.content:
+                while True:
+                    status_code = bot_message.press_button_at_index(0)
+                    bot_message.press_button_at_index(0)
+                    await asyncio.sleep(0.5)
+                    if not status_code == 204:
+                        break
+            
+            elif "Trivia" in message.content:
+                question = bot_message.trivia_get_question()
+                category = bot_message.trivia_get_category()
+                target_id = get_correct_trivia_id(bot_message.loaded_data_dict, question, category)
+                await asyncio.sleep(random.randint(2, 5))
+                if target_id is None:
+                    bot_message.press_random_button(4)
+                else:
+                    bot_message.press_button(target_id)
+
+            elif "secret number" in message.content:
+                if bot_message.highlow_get_hint_number() <= 50:
+                    bot_message.press_button_at_index(2)
+                else:
+                    bot_message.press_button_at_index(0)
+
+            elif "Results for" in message.content:
+                value = int(bot_message.dumped_data.split("⏣")[1].split("and")[0])
+                bot_message.add_and_log("Event", value)
 
         if bot_message.command_name == "hl":
             if bot_message.highlow_get_hint_number() <= 50:
@@ -519,6 +540,68 @@ async def on_message(message: discord.Message):
                     bot_message.press_button_at_index(0)
             elif "Bank Note" in message.content:
                 post_message("pls use banknote 1")
+        
+        elif bot_message.command_name == "work":
+            if "Your salary has increased" in message.content:
+                post_message('pls work')
+            
+            elif "You don't currently have a job to work at" in message.content:
+                post_message('pls work babysitter')
+                await asyncio.sleep(5)
+                post_message('pls work')
+            
+            elif "Hit the Ball!" in message.content:
+
+                # TODO Dubious, must test
+
+                if message.content.split(":soccer:")[0] == "":
+                    bot_message.press_button_at_index(2)
+                else:
+                    bot_message.press_button_at_index(0)
+            
+            elif "Dunk the ball!" in message.content:
+
+                # TODO Also dubious
+
+                if message.content.split(":basketball:")[0] == "       ":
+                    bot_message.press_button_at_index(1)
+                elif message.content.split(":basketball:")[0] == "":
+                    bot_message.press_button_at_index(0)
+                else:
+                    bot_message.press_button_at_index(2)
+            
+            elif "Repeat Order" in message.content:
+
+                # TODO Dubious
+
+                work_list = [bot_message.dumped_data.split("Remember words order! ")[1].replace("", ", ")]
+                labels, label_list = get_label_mapping_and_list(bot_message)
+                await asyncio.sleep(6)
+                for item in work_list:
+                    if item in label_list:
+                        bot_message.press_button_at_index(label_list.index(item))
+            
+            elif "color" in message.content:
+
+                # TODO Mmmm how to select color with only one dumped data split?
+
+                work_copy = [bot_message.dumped_data.split("selected word. ")[1]]
+                labels, label_list = get_label_mapping_and_list(bot_message)
+                await asyncio.sleep(6)
+                for item in work_copy:
+                    if item in label_list:
+                        bot_message.press_button_at_index(label_list.index(item))
+            
+            elif "emoji closely!" in message.content:
+
+                # TODO Dubious at best
+
+                work_copy = [bot_message.dumped_data.split("Look at the emoji closely! ")[1]]
+                labels, label_list = get_label_mapping_and_list(bot_message)
+                await asyncio.sleep(6)
+                for item in work_copy:
+                    if item in label_list:
+                        bot_message.press_button_at_index(label_list.index(item))
     except:
         pass
 
@@ -592,6 +675,11 @@ async def on_message_edit(_, message: discord.Message):
             if "You got that answer correct" in bot_message.dumped_data:
                 value = int(bot_message.dumped_data.split("you also got ")[1].split(" coins")[0].replace(",", ""))
                 bot_message.add_and_log("Trivia", value)
+        
+        elif bot_message.command_name == "work":
+            if "You were given" in bot_message.dumped_data:
+                value = int(bot_message.dumped_data.split("You were given ")[1].split(" for")[0].replace(",", ""))
+                bot_message.add_and_log("Work", value)
     except:
         pass
 
